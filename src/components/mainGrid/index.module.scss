@@ -1,0 +1,27 @@
+
+
+.analystContainer{
+    display: flex;
+    flex-direction: column;
+
+    .anaylistCalendarDateBox{
+        display: flex;
+        flex-direction: row;
+        place-items: center;
+        }
+
+    .rightCalendarBox{
+    display: flex;
+    }
+}
+
+.analystCell{
+    width: 40px;
+    height: 58px;
+    border: 1px solid #CED4DA;
+    cursor: pointer;
+    .analystCell{
+      border: none;
+      cursor: pointer;
+    }
+}
