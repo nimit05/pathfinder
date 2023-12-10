@@ -3,8 +3,7 @@ import styles from './index.module.scss';
 
 interface Cell {
   id: string;
-  content: string;
-  inner: number[];
+  inner: string[];
 }
 
 const Grid: React.FC = () => {
@@ -12,12 +11,15 @@ const Grid: React.FC = () => {
 
   const generateGridData = (): Cell[] => {
     const gridData: Cell[] = [];
-
+    const rows = 30;
       for (let col = 0; col < cols; col++) {
+        const inner = [];
+        for(let row = 0; row < rows; row++) {
+            inner.push(`${row}-${col}`)
+        }
         gridData.push({
           id: `-${col}`,
-          content: `Cell -${col}`,
-          inner: [1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9],
+          inner,
         });
       }
 
@@ -30,15 +32,20 @@ const Grid: React.FC = () => {
     setGrid(generateGridData());
   }, [cols]);
 
+  const handleCellClick = (id:string) => {
+    console.log('3333', id);
+  }
+
   return (
     <div className={styles.analystContainer}>
     {grid?.map((data) => (
       <div className={styles.anaylistCalendarDateBox}>
         <div className={styles.rightCalendarBox}
         >
-          {data.inner.map(() => (
+          {data.inner.map((id:string) => (
               <div
                 className={`${styles.analystCell}`}
+                onClick={() => handleCellClick(id)}
               />
             ))}
         </div>
