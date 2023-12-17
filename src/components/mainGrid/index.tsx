@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowIcon } from '../../assets/arrow';
 import { TargetIcon } from '../../assets/target';
 import styles from './index.module.scss';
 import { Cell, InnerDetails } from './types';
-
-
+import { ArrowIcon } from '../../assets/arrow';
 
 const Grid: React.FC = () => {
   const cols = 3;
@@ -12,10 +10,9 @@ const Grid: React.FC = () => {
   const generateGridData = (): Cell[] => {
     const gridData: Cell[] = [];
     const rows = 30;
-    const cellSize = 20; // Adjust the cell size as needed
+    const cellSize = 20;
     const innerWidth = window.innerWidth;
   
-    // Calculate the number of columns based on the inner width and cell size
     const cols = Math.floor(innerWidth / cellSize);
   
     for (let row = 0; row < rows; row++) {
@@ -33,84 +30,84 @@ const Grid: React.FC = () => {
   };
 
   const [grid, setGrid] = useState<Cell[]>(generateGridData());
-  const [startPoint, setStartPoint] = useState<InnerDetails>({x: 6, y: 6});
+  const [startPoint, setStartPoint] = useState<InnerDetails>({x: 10, y: 16});
   const [targetPoint, setTargetPoint] = useState<InnerDetails>({x: 5, y: 30});
-
-  const [isDragging, setIsDragging] = useState(false);
+  const [selectedPoint, setSelectedPoint] = useState<InnerDetails | null>(null);
 
   useEffect(() => {
     setGrid(generateGridData());
   }, [cols]);
 
   const handleCellClick = (detail: InnerDetails) => {
-    if (isDragging) {
-      setTargetPoint(detail);
-    } else {
+    const x = detail.x;
+    const y = detail.y;
+
+    if((selectedPoint === null) &&( (startPoint.x === x && startPoint.y === y) || (targetPoint.x === x && targetPoint.y === y))){
+      setSelectedPoint(detail);
+      return;
+    }
+
+    if(selectedPoint?.x === startPoint.x && selectedPoint.y === startPoint.y) {
+      if(x === targetPoint.x && y === targetPoint.y){
+        return;
+      }
+
       setStartPoint(detail);
+      setSelectedPoint(null);
+      return;
     }
-  };
 
-  const handleMouseDown = () => {
-    setIsDragging(true);
-  };
+    if(selectedPoint?.x === targetPoint.x && selectedPoint.y === targetPoint.y) {
+      if(x === startPoint.x && y === startPoint.y){
+        return;
+      }
 
-  const handleMouseMove = () => {
-    if (isDragging) {
-      // Add additional logic if needed while dragging
+      setTargetPoint(detail);
+      setSelectedPoint(null);
+      return;
     }
+
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  const isBorder = (detail: InnerDetails) => {
+    const x = detail.x;
+    const y = detail.y;
+
+    if((x === startPoint.x && y === startPoint.y) && selectedPoint?.x === x && selectedPoint.y === y) {
+      return true;
+    }
+
+    if((x === targetPoint.x && y === targetPoint.y) && selectedPoint?.x === x && selectedPoint.y === y) {
+      return true;
+    }
+
+    return false;
+  }
 
   return (
-    <div
-      className={styles.analystContainer}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-    >
-      {grid?.map((data) => (
-        <div
-          className={styles.anaylistCalendarDateBox}
-          onMouseDown={handleMouseDown}
-        >
-          <div className={styles.rightCalendarBox}>
-            {data.inner.map((detail: InnerDetails) => {
-              if (detail.x === startPoint.x && detail.y === startPoint.y) {
-                return (
-                  <div className={`${styles.analystCell}`}>
-                    <ArrowIcon />
-                  </div>
-                );
-              }
 
-              if (detail.x === targetPoint.x && detail.y === targetPoint.y) {
-                return (
-                  <div className={`${styles.analystCell}`}>
-                    <TargetIcon />
-                  </div>
-                );
-              }
-              return (
+      <div className={styles.analystContainer} >
+        {grid?.map((data) => (
+          <div key={data.id} className={styles.anaylistCalendarDateBox}>
+            <div className={styles.rightCalendarBox}>
+              {data.inner.map((detail: InnerDetails) => (
                 <div
-                  className={`${styles.analystCell}`}
+                  key={`${detail.x}-${detail.y}`}
+                  className={`${styles.analystCell} ${ isBorder(detail) ? styles.selectedBorder : ''}`}
                   onClick={() => handleCellClick(detail)}
-                />
-              );
-            })}
+                >
+                  {detail.x === startPoint.x && detail.y === startPoint.y && (
+                    <ArrowIcon />
+                  )}
+                  {detail.x === targetPoint.x && detail.y === targetPoint.y && (
+                    <TargetIcon />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-      {/* {isDragging && (
-        <div
-          className={styles.draggedIcon}
-          style={draggedIconStyle}
-        >
-          <ArrowIcon />
-        </div>
-      )} */}
-    </div>
+        ))}
+      </div>
   );
 };
 

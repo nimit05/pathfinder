@@ -1,6 +1,7 @@
 
 
 .analystContainer{
+
     display: flex;
     flex-direction: column;
 
@@ -11,16 +12,21 @@
         }
 
     .rightCalendarBox{
-    display: flex;
+        display: flex;
+    }
+
+    .analystCell{
+        width: 20px;
+        height: 20px;
+        border: 1px solid #CED4DA;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .selectedBorder{
+        border: solid 1px black;
     }
 }
 
-.analystCell{
-    width: 20px;
-    height: 20px;
-    border: 1px solid #CED4DA;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
