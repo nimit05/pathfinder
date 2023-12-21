@@ -3,6 +3,7 @@ import { TargetIcon } from '../../assets/target';
 import styles from './index.module.scss';
 import { Cell, InnerDetails } from './types';
 import { ArrowIcon } from '../../assets/arrow';
+import { bfs } from '../../algorithms/bfs';
 
 const Grid: React.FC = () => {
   const cols = 3;
@@ -30,13 +31,44 @@ const Grid: React.FC = () => {
   };
 
   const [grid, setGrid] = useState<Cell[]>(generateGridData());
-  const [startPoint, setStartPoint] = useState<InnerDetails>({x: 10, y: 16});
+  const [startPoint, setStartPoint] = useState<InnerDetails>({x: 5, y: 16});
   const [targetPoint, setTargetPoint] = useState<InnerDetails>({x: 5, y: 30});
   const [selectedPoint, setSelectedPoint] = useState<InnerDetails | null>(null);
+  const [path, setPath] = useState<InnerDetails[] | null>(null);
 
   useEffect(() => {
     setGrid(generateGridData());
   }, [cols]);
+
+  async function handlePathChange() {
+    if(path){
+      const newGrid = [...grid];
+      path.forEach(element => {
+        const innerCol = newGrid[element.x].inner;
+        innerCol[element.y].className = '';
+      });
+        setGrid(newGrid);
+    }
+
+    const newPath = bfs(grid, startPoint, targetPoint);
+    if(newPath){
+      const newGrid = [...grid];
+      newPath.forEach(async element => {
+        const innerCol = newGrid[element.x].inner;
+        innerCol[element.y].className = styles.yellowBg;
+        setGrid(newGrid);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      });
+
+      setPath(newPath);
+
+    }
+
+  }
+
+  useEffect(() => {
+    handlePathChange()
+  }, [startPoint, targetPoint]);
 
   const handleCellClick = (detail: InnerDetails) => {
     const x = detail.x;
@@ -93,7 +125,7 @@ const Grid: React.FC = () => {
               {data.inner.map((detail: InnerDetails) => (
                 <div
                   key={`${detail.x}-${detail.y}`}
-                  className={`${styles.analystCell} ${ isBorder(detail) ? styles.selectedBorder : ''}`}
+                  className={`${styles.analystCell} ${ isBorder(detail) ? styles.selectedBorder : ''} ${detail.className}`}
                   onClick={() => handleCellClick(detail)}
                 >
                   {detail.x === startPoint.x && detail.y === startPoint.y && (

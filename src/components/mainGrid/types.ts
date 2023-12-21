@@ -1,6 +1,7 @@
 export interface InnerDetails {
     x: number;
     y: number;
+    className?: string;
 }
 
 export interface Cell {
